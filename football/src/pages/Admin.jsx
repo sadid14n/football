@@ -6,6 +6,8 @@ const Admin = () => {
   const {
     teams,
     setTeams,
+    players,
+    setPlayers,
     match,
     setMatch,
     matchStats,
@@ -17,6 +19,8 @@ const Admin = () => {
   const [teamA, setTeamA] = useState("");
   const [teamB, setTeamB] = useState("");
   const [scorer, setScorer] = useState("");
+  const [assist, setAssist] = useState("");
+  const [foulPlayer, setFoulPlayer] = useState("");
 
   const [seconds, setSeconds] = useState(0);
   const [minutes, setMinutes] = useState(0);
@@ -24,6 +28,8 @@ const Admin = () => {
   const [matchStatus, setMatchStatus] = useState("First Half");
 
   const [sortedLeaderBoard, setSortedLeaderBoard] = useState([]);
+
+  const [sortedPlayerLeaderBoard, setSortedPlayerLeaderBoard] = useState([]);
 
   const handleCreateMatch = () => {
     if (!teamA || !teamB || teamA === teamB) return;
@@ -44,8 +50,8 @@ const Admin = () => {
     setIsMatchRunning(true);
   };
 
-  const handleGoalUpdate = (team, goalScorer) => {
-    if (!goalScorer || !team) return;
+  const handleGoalUpdate = (team, goalScorer, assist) => {
+    if (!goalScorer || !team || !assist) return;
 
     setMatch((prevMatch) => ({
       ...prevMatch,
@@ -55,12 +61,11 @@ const Admin = () => {
       },
     }));
 
-    // Update match stats
     setMatchStats((prevStats) => ({
       ...prevStats,
       [team]: {
         ...prevStats[team],
-        goals: [...(prevStats[team]?.goals || []), goalScorer], // Preserve previous goals
+        goals: [...(prevStats[team]?.goals || []), goalScorer],
       },
     }));
 
@@ -71,11 +76,29 @@ const Admin = () => {
         goalsScored: (prevTeams[team]?.goalsScored || 0) + 1,
       },
     }));
+
+    setPlayers((prevPlayers) =>
+      prevPlayers.map((player) =>
+        player.name === goalScorer
+          ? { ...player, goals: player.goals + 1 }
+          : player
+      )
+    );
+
+    setPlayers((prevPlayers) =>
+      prevPlayers.map((player) =>
+        player.name === assist
+          ? { ...player, assists: player.assists + 1 }
+          : player
+      )
+    );
+
     setScorer("");
+    setAssist("");
   };
 
-  const handleFoul = (team, card) => {
-    if (!team || !card) return;
+  const handleFoul = (team, foulPlayer, card) => {
+    if (!team || !card || !foulPlayer) return;
 
     setMatchStats((prevStats) => ({
       ...prevStats,
@@ -85,6 +108,14 @@ const Admin = () => {
         fouls: prevStats[team].fouls + 1,
       },
     }));
+
+    setPlayers((prevPlayers) =>
+      prevPlayers.map((player) =>
+        player.name === foulPlayer
+          ? { ...player, fouls: player.fouls + 1 } // Increment the player's fouls count
+          : player
+      )
+    );
   };
 
   const handleFinalMatch = () => {
@@ -193,7 +224,6 @@ const Admin = () => {
       points: teams[teamKey].points,
     }));
 
-    // Sort by points first, then goalsScored in case of a tie in points
     leaderBoard.sort(
       (a, b) => b.points - a.points || b.goalsScored - a.goalsScored
     );
@@ -204,6 +234,27 @@ const Admin = () => {
   useEffect(() => {
     getLeaderBoard();
   }, [teams]);
+
+  const getPlayerLeaderBoard = () => {
+    const playerLeaderBoard = players.map((player) => ({
+      name: player.name,
+      goals: player.goals,
+      assists: player.assists,
+      fouls: player.fouls,
+      // yellowCards: player.yellowCards,
+      // redCards: player.redCards,
+    }));
+
+    playerLeaderBoard.sort(
+      (a, b) => b.goals - a.goals || b.assists - a.assists || a.fouls - b.fouls
+    );
+
+    setSortedPlayerLeaderBoard(playerLeaderBoard);
+  };
+
+  useEffect(() => {
+    getPlayerLeaderBoard();
+  }, [players]);
 
   return (
     <div className="p-6 bg-gray-900 text-white min-h-screen">
@@ -299,7 +350,25 @@ const Admin = () => {
               value={scorer}
               onChange={(e) => setScorer(e.target.value)}
             >
-              <option value="">Select Player</option>
+              <option value="">Select Goal Scorer</option>
+              {teams[match.teamA]?.players &&
+                teams[match.teamB]?.players &&
+                [
+                  ...teams[match.teamA].players,
+                  ...teams[match.teamB].players,
+                ].map((player) => (
+                  <option key={player} value={player}>
+                    {player}
+                  </option>
+                ))}
+            </select>
+
+            <select
+              className="p-2 bg-gray-700"
+              value={assist}
+              onChange={(e) => setAssist(e.target.value)}
+            >
+              <option value="">Select Assist</option>
               {teams[match.teamA]?.players &&
                 teams[match.teamB]?.players &&
                 [
@@ -314,14 +383,14 @@ const Admin = () => {
 
             <button
               className="ml-4 px-4 py-2 cursor-pointer bg-green-500 rounded"
-              onClick={() => handleGoalUpdate(match.teamA, scorer)}
+              onClick={() => handleGoalUpdate(match.teamA, scorer, assist)}
             >
               <span className="capitalize">Goal for {match.teamA}</span>
             </button>
 
             <button
               className="ml-4 cursor-pointer px-4 py-2 bg-red-500 rounded"
-              onClick={() => handleGoalUpdate(match.teamB, scorer)}
+              onClick={() => handleGoalUpdate(match.teamB, scorer, assist)}
             >
               <span className="capitalize">Goal for {match.teamB}</span>
             </button>
@@ -336,30 +405,47 @@ const Admin = () => {
           </h2>
 
           <div className="flex flex-col gap-5 md:flex-row">
+            <select
+              className="p-2 bg-gray-700"
+              value={foulPlayer}
+              onChange={(e) => setFoulPlayer(e.target.value)}
+            >
+              <option value="">Select Foul Player</option>
+              {teams[match.teamA]?.players &&
+                teams[match.teamB]?.players &&
+                [
+                  ...teams[match.teamA].players,
+                  ...teams[match.teamB].players,
+                ].map((player) => (
+                  <option key={player} value={player}>
+                    {player}
+                  </option>
+                ))}
+            </select>
             <button
               className="mr-4 px-4 py-2 cursor-pointer bg-yellow-500 rounded"
-              onClick={() => handleFoul(match.teamA, "yellowCards")}
+              onClick={() => handleFoul(match.teamA, foulPlayer, "yellowCards")}
             >
               Yellow Card - {teams[match.teamA].name}
             </button>
 
             <button
               className="mr-4 px-4 py-2 cursor-pointer bg-yellow-500 rounded"
-              onClick={() => handleFoul(match.teamB, "yellowCards")}
+              onClick={() => handleFoul(match.teamB, foulPlayer, "yellowCards")}
             >
               Yellow Card - {teams[match.teamB].name}
             </button>
 
             <button
               className="mr-4 px-4 py-2 cursor-pointer bg-red-600 rounded"
-              onClick={() => handleFoul(match.teamA, "redCards")}
+              onClick={() => handleFoul(match.teamA, foulPlayer, "redCards")}
             >
               Red Card - {teams[match.teamA].name}
             </button>
 
             <button
               className="mr-4 px-4 py-2 cursor-pointer bg-red-600 rounded"
-              onClick={() => handleFoul(match.teamB, "redCards")}
+              onClick={() => handleFoul(match.teamB, foulPlayer, "redCards")}
             >
               Red Card - {teams[match.teamB].name}
             </button>
@@ -389,9 +475,9 @@ const Admin = () => {
         </div>
       )}
 
-      <h1 className="text-2xl font-bold mb-6 text-center mt-6">
+      <h2 className="text-2xl font-bold mb-6 text-center mt-6">
         Team Leaderboard
-      </h1>
+      </h2>
 
       <div className="overflow-auto">
         <div className="bg-gray-800 rounded-md p-4">
@@ -419,6 +505,41 @@ const Admin = () => {
               <div>{team.draws}</div>
               <div>{team.losses}</div>
               <div>{team.points}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <h2 className="text-2xl font-bold mb-6 text-center mt-6">
+        Player LeaderBoard
+      </h2>
+
+      <div className="overflow-auto">
+        <div className="bg-gray-800 rounded-md p-4">
+          <div className="flex justify-between p-3 bg-gray-700 font-bold text-lg text-center">
+            <div>Rank</div>
+            <div>Player</div>
+            <div>Goals</div>
+            <div>Assists</div>
+            <div>Fouls</div>
+            {/* <div>Yellow Cards</div>
+            <div>Red Cards</div> */}
+          </div>
+
+          {sortedPlayerLeaderBoard.map((player, index) => (
+            <div
+              key={index}
+              className={`flex justify-between p-3 ${
+                index % 2 === 0 ? "bg-gray-700" : "bg-gray-600"
+              } text-lg`}
+            >
+              <div>{index + 1}</div>
+              <div>{player.name}</div>
+              <div>{player.goals}</div>
+              <div>{player.assists}</div>
+              <div>{player.fouls}</div>
+              {/* <div>{player.yellowCards}</div>
+              <div>{player.redCards}</div> */}
             </div>
           ))}
         </div>
