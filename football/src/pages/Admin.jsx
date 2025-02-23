@@ -181,6 +181,10 @@ const Admin = () => {
   useEffect(() => {
     let interval;
 
+    if (!isMatchRunning) {
+      return;
+    }
+
     if (!isPaused) {
       interval = setInterval(() => {
         setSeconds((prevSeconds) => {
@@ -212,7 +216,7 @@ const Admin = () => {
     }
 
     return () => clearInterval(interval);
-  }, [isPaused]);
+  }, [isPaused, isMatchRunning]);
 
   const getLeaderBoard = () => {
     const leaderBoard = Object.keys(teams).map((teamKey) => ({
@@ -258,7 +262,9 @@ const Admin = () => {
 
   return (
     <div className="p-6 bg-gray-900 text-white min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Admin Panel - Update Match</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        The Football Vault
+      </h1>
 
       <div className="mb-6">
         <h2 className="text-xl mb-2">Start a New Match</h2>
@@ -301,42 +307,65 @@ const Admin = () => {
 
       {match.teamA && match.teamB && (
         <div className="mb-6 p-4 bg-gray-800 rounded">
-          <h2 className="text-xl font-semibold mb-2">Current Match</h2>
-          <p className="text-lg flex items-center">
-            {`${teams[match.teamA].name} `}
-            {matchStats[match.teamA].yellowCards > 0 && (
-              <span className="ml-2 text-yellow-400 mr-2">
-                🟨 x {matchStats[match.teamA].yellowCards}
-              </span>
-            )}
-            {matchStats[match.teamA].redCards > 0 && (
-              <span className="ml-2 mr-2 text-red-500">
-                🟥 x {matchStats[match.teamA].redCards}
-              </span>
-            )}
-            vs {teams[match.teamB].name}
-            {matchStats[match.teamB].yellowCards > 0 && (
-              <span className="ml-2 text-yellow-400">
-                🟨 x {matchStats[match.teamB].yellowCards}
-              </span>
-            )}
-            {matchStats[match.teamB].redCards > 0 && (
-              <span className="ml-2 text-red-500">
-                🟥 x {matchStats[match.teamB].redCards}
-              </span>
-            )}
-          </p>
+          <h2 className="font-semibold mb-2 text-center md:text-4xl text-3xl">
+            Current Match
+          </h2>
+          <div className="text-lg flex md:flex-row justify-center flex-col items-center gap-3">
+            <div className="flex-col items-center mt-5 ">
+              <p className="md:text-4xl text-3xl ">{`${
+                teams[match.teamA].name
+              } `}</p>
+              {matchStats[match.teamA].yellowCards > 0 && (
+                <span className="ml-2 text-yellow-400 mr-2">
+                  🟨 x {matchStats[match.teamA].yellowCards}
+                </span>
+              )}
+              {matchStats[match.teamA].redCards > 0 && (
+                <span className="ml-2 mr-2 text-red-500">
+                  🟥 x {matchStats[match.teamA].redCards}
+                </span>
+              )}
+              <p className="text-3xl text-center font-bold md:hidden mt-4">
+                {match.score[teamA]}
+              </p>
+            </div>
+            <div className="flex gap-4 md:flex-col md:mx-7">
+              <span>vs</span>{" "}
+              <i class="fa-solid fa-volleyball fa-bounce text-2xl md:text-4xl"></i>
+            </div>
+            <div className="mb-6 flex-col items-center ">
+              <p className="text-3xl mb-2 text-center font-bold md:hidden">
+                {match.score[teamB]}
+              </p>
+              <p className="md:text-4xl text-3xl">{teams[match.teamB].name}</p>
+              {matchStats[match.teamB].yellowCards > 0 && (
+                <span className="ml-2 text-yellow-400">
+                  🟨 x {matchStats[match.teamB].yellowCards}
+                </span>
+              )}
+              {matchStats[match.teamB].redCards > 0 && (
+                <span className="ml-2 text-red-500">
+                  🟥 x {matchStats[match.teamB].redCards}
+                </span>
+              )}
+            </div>
+          </div>
 
-          <p className="text-lg font-bold">
-            Score: {match.score[teamA]} - {match.score[teamB]}
-          </p>
+          <div className=" font-bold max-md:hidden text-center text-5xl flex gap-44 justify-center w-">
+            <span className="">{match.score[teamA]}</span>-
+            <span className="">{match.score[teamB]}</span>
+          </div>
 
-          <h2 className="text-xl font-bold mb-2">Match Timer</h2>
-          <p className="text-lg font-semibold">
+          <h2 className="text-lg font-bold mb-2 text-center max-md:text-md">
+            Match Timer
+          </h2>
+          <p className="font-semibold text-center text-2xl md:text-3xl">
             {minutes}:{seconds < 10 ? `0${seconds}` : seconds} ⏳
           </p>
 
-          <p className="text-xl font-semibold mt-2">{matchStatus}</p>
+          <p className="text-xl max-md:text-md font-semibold mt-2 text-center">
+            {matchStatus}
+          </p>
         </div>
       )}
 
