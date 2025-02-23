@@ -508,70 +508,102 @@ const Admin = () => {
         Team Leaderboard
       </h2>
 
-      <div className="overflow-auto">
-        <div className="bg-gray-800 rounded-md p-4">
-          <div className="flex justify-between p-3 bg-gray-700 font-bold text-lg text-center">
-            <div>Rank</div>
-            <div>Team</div>
-            <div>Goals</div>
-            <div>Wins</div>
-            <div>Draws</div>
-            <div>Losses</div>
-            <div>Points</div>
-          </div>
-
-          {sortedLeaderBoard.map((team, index) => (
-            <div
-              key={index}
-              className={`flex justify-between p-3 ${
-                index % 2 === 0 ? "bg-gray-700" : "bg-gray-600"
-              } text-lg`}
-            >
-              <div>{index + 1}</div>
-              <div>{team.name}</div>
-              <div>{team.goalsScored}</div>
-              <div>{team.wins}</div>
-              <div>{team.draws}</div>
-              <div>{team.losses}</div>
-              <div>{team.points}</div>
-            </div>
-          ))}
-        </div>
+      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+              <th scope="col" className="px-6 py-3">
+                Rank
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Team
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Goals
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Wins
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Draws
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Losses
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Points
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedLeaderBoard.map((team, index) => (
+              <tr
+                key={index}
+                className={`odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 border-gray-200`}
+              >
+                <th
+                  scope="row"
+                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  {index + 1}
+                </th>
+                <td className="px-6 py-4">{team.name}</td>
+                <td className="px-6 py-4">{team.goalsScored}</td>
+                <td className="px-6 py-4">{team.wins}</td>
+                <td className="px-6 py-4">{team.draws}</td>
+                <td className="px-6 py-4">{team.losses}</td>
+                <td className="px-6 py-4">{team.points}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <h2 className="text-2xl font-bold mb-6 text-center mt-6">
         Player LeaderBoard
       </h2>
 
-      <div className="overflow-auto">
-        <div className="bg-gray-800 rounded-md p-4">
-          <div className="flex justify-between p-3 bg-gray-700 font-bold text-lg text-center">
-            <div>Rank</div>
-            <div>Player</div>
-            <div>Goals</div>
-            <div>Assists</div>
-            <div>Fouls</div>
-            {/* <div>Yellow Cards</div>
-            <div>Red Cards</div> */}
-          </div>
-
-          {sortedPlayerLeaderBoard.map((player, index) => (
-            <div
-              key={index}
-              className={`flex justify-between p-3 ${
-                index % 2 === 0 ? "bg-gray-700" : "bg-gray-600"
-              } text-lg`}
-            >
-              <div>{index + 1}</div>
-              <div>{player.name}</div>
-              <div>{player.goals}</div>
-              <div>{player.assists}</div>
-              <div>{player.fouls}</div>
-              {/* <div>{player.yellowCards}</div>
-              <div>{player.redCards}</div> */}
-            </div>
-          ))}
-        </div>
+      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+              <th scope="col" className="px-6 py-3">
+                Rank
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Player
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Goals
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Assists
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Fouls
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedPlayerLeaderBoard.map((player, index) => (
+              <tr
+                key={index}
+                className={`odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 border-gray-200`}
+              >
+                <th
+                  scope="row"
+                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  {index + 1}
+                </th>
+                <td className="px-6 py-4">{player.name}</td>
+                <td className="px-6 py-4">{player.goals}</td>
+                <td className="px-6 py-4">{player.assists}</td>
+                <td className="px-6 py-4">{player.fouls}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
