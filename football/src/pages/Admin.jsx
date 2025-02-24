@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { useGame } from "../context/GameContext";
+import { motion } from "framer-motion";
+import { FaFutbol } from "react-icons/fa";
+import AnimationAlert from "../Component/AnimationAlert";
 
 const Admin = () => {
   const {
@@ -20,6 +23,19 @@ const Admin = () => {
   const [scorer, setScorer] = useState("");
   const [assist, setAssist] = useState("");
   const [foulPlayer, setFoulPlayer] = useState("");
+
+  // For animation
+  const [goal, setGoal] = useState("");
+  const [foul, setFoul] = useState(false);
+  const [alertNotification, setAlertNotification] = useState({
+    type: "",
+    player: "",
+  });
+
+  const showAlert = (type, player = "") => {
+    setAlertNotification({ type, player });
+    setTimeout(() => setAlertNotification({ type: "", player: "" }), 2000);
+  };
 
   const [seconds, setSeconds] = useState(0);
   const [minutes, setMinutes] = useState(0);
@@ -50,6 +66,8 @@ const Admin = () => {
   const handleGoalUpdate = (team, goalScorer, assist) => {
     if (!goalScorer || !team || !assist) return;
 
+    showAlert("goal", goalScorer);
+
     setMatch((prevMatch) => ({
       ...prevMatch,
       score: {
@@ -58,11 +76,22 @@ const Admin = () => {
       },
     }));
 
+    // setMatchStats((prevStats) => ({
+    //   ...prevStats,
+    //   [team]: {
+    //     ...prevStats[team],
+    //     goals: [...(prevStats[team]?.goals || []), goalScorer],
+    //   },
+    // }));
+
     setMatchStats((prevStats) => ({
       ...prevStats,
       [team]: {
         ...prevStats[team],
-        goals: [...(prevStats[team]?.goals || []), goalScorer],
+        goals: [
+          ...(prevStats[team]?.goals || []),
+          { scorer: goalScorer, time: `${minutes}'` }, // Only stores minutes
+        ],
       },
     }));
 
@@ -97,6 +126,8 @@ const Admin = () => {
   const handleFoul = (team, foulPlayer, card) => {
     if (!team || !card || !foulPlayer) return;
 
+    showAlert(card, foulPlayer);
+
     setMatchStats((prevStats) => ({
       ...prevStats,
       [team]: {
@@ -113,6 +144,7 @@ const Admin = () => {
           : player
       )
     );
+    setFoulPlayer("");
   };
 
   const handleFinalMatch = () => {
@@ -259,9 +291,14 @@ const Admin = () => {
 
   return (
     <div className="p-6 bg-gray-900 text-white min-h-screen">
-      <h1 className="text-3xl font-bold mb-6 text-center">
-        The Football Vault
-      </h1>
+      {alertNotification.type && (
+        <AnimationAlert
+          type={alertNotification.type}
+          player={alertNotification.player}
+        />
+      )}
+
+      <h1 className="text-3xl font-bold mb-6 text-center ">KickOff Live</h1>
 
       <div className="mb-6">
         <h2 className="text-xl mb-2">Start a New Match</h2>
@@ -307,6 +344,7 @@ const Admin = () => {
           <h2 className="font-semibold mb-2 text-center md:text-4xl text-3xl">
             Current Match
           </h2>
+
           <div className="text-lg flex md:flex-row justify-center flex-col items-center gap-3">
             <div className="flex-col items-center mt-5 ">
               <p className="md:text-4xl text-3xl ">{`${
@@ -322,6 +360,12 @@ const Admin = () => {
                   🟥 x {matchStats[match.teamA].redCards}
                 </span>
               )}
+              {matchStats[match.teamA]?.goals.map((goal, index) => (
+                <p key={index} className="text-white">
+                  ⚽ {goal.scorer} scored at {goal.time}
+                </p>
+              ))}
+
               <p className="text-3xl text-center font-bold md:hidden mt-4">
                 {match.score[teamA]}
               </p>
@@ -345,6 +389,11 @@ const Admin = () => {
                   🟥 x {matchStats[match.teamB].redCards}
                 </span>
               )}
+              {matchStats[match.teamB]?.goals.map((goal, index) => (
+                <p key={index} className="text-white">
+                  ⚽ {goal.scorer} scored at {goal.time}
+                </p>
+              ))}
             </div>
           </div>
 
