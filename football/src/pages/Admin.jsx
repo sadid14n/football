@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useGame } from "../context/GameContext";
-import ReactGA from "react-ga";
 
 const Admin = () => {
   const {
@@ -46,13 +45,6 @@ const Admin = () => {
     });
 
     setIsMatchRunning(true);
-
-    ReactGA.event({
-      category: "Match",
-      action: "Created Match",
-      label: `${teamA} vs ${teamB}`,
-      value: `${teamA} vs ${teamB}`,
-    });
   };
 
   const handleGoalUpdate = (team, goalScorer, assist) => {
@@ -243,10 +235,6 @@ const Admin = () => {
   useEffect(() => {
     getLeaderBoard();
   }, [teams]);
-
-  useEffect(() => {
-    ReactGA.pageview(window.location.pathname);
-  }, []);
 
   const getPlayerLeaderBoard = () => {
     const playerLeaderBoard = players.map((player) => ({
