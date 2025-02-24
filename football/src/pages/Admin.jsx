@@ -46,6 +46,7 @@ const Admin = () => {
     });
 
     setIsMatchRunning(true);
+
     ReactGA.event({
       category: "Match",
       action: "Created Match",
