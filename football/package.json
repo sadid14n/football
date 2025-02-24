@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "react-scripts build && terser build/static/js/*.js --compress --mangle --output build/static/js/",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
