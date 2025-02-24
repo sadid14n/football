@@ -1,18 +1,34 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
 import Admin from "./pages/Admin";
 import { GameProvider } from "./context/GameContext";
 import ReactGA from "react-ga4";
 import { useEffect } from "react";
 
-const TRACKING_ID = "G-Z1SMDCG39L";
+const trackingId = import.meta.env.VITE_GA_TRACKING_ID;
+
+// Track page views when route changes
+function TrackPageViews() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (trackingId) {
+      ReactGA.send({ hitType: "pageview", page: location.pathname });
+    }
+  }, [location]);
+
+  return null;
+}
 function App() {
   useEffect(() => {
-    ReactGA.initialize(TRACKING_ID, { debug: true });
-    ReactGA.send("pageview"); // Ensures the first page load is tracked
+    if (trackingId) {
+      ReactGA.initialize(trackingId);
+    }
   }, []);
+
   return (
     <GameProvider>
+      <TrackPageViews />
       <Routes>
         <Route path="/" element={<Admin />} />
       </Routes>
