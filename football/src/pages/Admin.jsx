@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useGame } from "../context/GameContext";
-import { Table } from "antd";
 
 const Admin = () => {
   const {
