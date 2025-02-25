@@ -373,48 +373,69 @@ const Admin = () => {
 
       <h1 className="text-3xl font-bold mb-6 text-center ">KickOff Live</h1>
 
-      <div className="mb-6">
-        <h2 className="text-xl mb-2">Start a New Match</h2>
+      {match.teamA && match.teamB ? (
+        <button
+          className="bg-blue-500 py-2 px-3 my-3"
+          onClick={() => window.location.reload()}
+        >
+          Start a New Match
+        </button>
+      ) : (
+        <div className="mb-6">
+          <h2 className="text-xl mb-2">Start a New Match</h2>
 
-        <div className="flex md:flex-row flex-col gap-5">
-          <select
-            className="p-2 bg-gray-800"
-            value={teamA}
-            onChange={(e) => setTeamA(e.target.value)}
-          >
-            <option value="">Select Team A</option>
-            {Object.keys(teams).map((team) => (
-              <option key={team} value={team}>
-                {teams[team].name}
-              </option>
-            ))}
-          </select>
+          <div className="flex md:flex-row flex-col gap-5">
+            <select
+              className="p-2 bg-gray-800"
+              value={teamA}
+              onChange={(e) => setTeamA(e.target.value)}
+            >
+              <option value="">Select Team A</option>
+              {Object.keys(teams).map((team) => (
+                <option key={team} value={team}>
+                  {teams[team].name}
+                </option>
+              ))}
+            </select>
 
-          <select
-            className="p-2 bg-gray-800 ml-2"
-            value={teamB}
-            onChange={(e) => setTeamB(e.target.value)}
-          >
-            <option value="">Select Team B</option>
-            {Object.keys(teams).map((team) => (
-              <option key={team} value={team}>
-                {teams[team].name}
-              </option>
-            ))}
-          </select>
+            <select
+              className="p-2 bg-gray-800 ml-2"
+              value={teamB}
+              onChange={(e) => setTeamB(e.target.value)}
+            >
+              <option value="">Select Team B</option>
+              {Object.keys(teams).map((team) => (
+                <option key={team} value={team}>
+                  {teams[team].name}
+                </option>
+              ))}
+            </select>
 
-          <button
-            className="ml-4 px-4 cursor-pointer py-2 bg-blue-500 rounded"
-            onClick={handleCreateMatch}
-          >
-            Start Match
-          </button>
+            <div
+              onClick={() => {
+                if (isFinalized) {
+                  alert(
+                    "The match is over! Please refresh the page to start a new match."
+                  );
+                }
+              }}
+              className="py-2 "
+            >
+              <button
+                className="ml-4 px-4 cursor-pointer py-2 bg-blue-500 rounded"
+                disabled={isFinalized}
+                onClick={handleCreateMatch}
+              >
+                Start Match
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {match.teamA && match.teamB && (
         <div className="mb-6 p-4 bg-gray-800 rounded">
-          <h2 className="font-semibold mb-2 text-center md:text-4xl text-3xl">
+          <h2 className="font-semibold mb-2 text-center md:text-4xl text-2xl">
             Current Match
           </h2>
 
@@ -538,6 +559,7 @@ const Admin = () => {
 
             <button
               className="ml-4 px-4 py-2 cursor-pointer bg-green-500 rounded"
+              disabled={isFinalized}
               onClick={() => handleGoalUpdate(match.teamA, scorer, assist)}
             >
               <span className="capitalize">Goal for {match.teamA}</span>
@@ -545,6 +567,7 @@ const Admin = () => {
 
             <button
               className="ml-4 cursor-pointer px-4 py-2 bg-red-500 rounded"
+              disabled={isFinalized}
               onClick={() => handleGoalUpdate(match.teamB, scorer, assist)}
             >
               <span className="capitalize">Goal for {match.teamB}</span>
@@ -579,6 +602,7 @@ const Admin = () => {
             </select>
             <button
               className="mr-4 px-4 py-2 cursor-pointer bg-yellow-500 rounded"
+              disabled={isFinalized}
               onClick={() => handleFoul(match.teamA, foulPlayer, "yellowCards")}
             >
               Yellow Card - {teams[match.teamA].name}
@@ -586,6 +610,7 @@ const Admin = () => {
 
             <button
               className="mr-4 px-4 py-2 cursor-pointer bg-yellow-500 rounded"
+              disabled={isFinalized}
               onClick={() => handleFoul(match.teamB, foulPlayer, "yellowCards")}
             >
               Yellow Card - {teams[match.teamB].name}
@@ -593,6 +618,7 @@ const Admin = () => {
 
             <button
               className="mr-4 px-4 py-2 cursor-pointer bg-red-600 rounded"
+              disabled={isFinalized}
               onClick={() => handleFoul(match.teamA, foulPlayer, "redCards")}
             >
               Red Card - {teams[match.teamA].name}
@@ -600,6 +626,7 @@ const Admin = () => {
 
             <button
               className="mr-4 px-4 py-2 cursor-pointer bg-red-600 rounded"
+              disabled={isFinalized}
               onClick={() => handleFoul(match.teamB, foulPlayer, "redCards")}
             >
               Red Card - {teams[match.teamB].name}
@@ -624,6 +651,7 @@ const Admin = () => {
             className={`mt-4 px-6 py-3 rounded cursor-pointer ${
               isPaused ? "bg-green-500" : "bg-red-500"
             }`}
+            disabled={isFinalized}
             onClick={handlePauseResume}
           >
             {isPaused ? "▶ Resume Match" : "⏸ Pause Match"}
