@@ -282,6 +282,11 @@ const Admin = () => {
   useEffect(() => {
     let interval;
 
+    if (isFinalized) {
+      setMatchStatus("Final Score 🎉");
+      return;
+    }
+
     if (!isMatchRunning) {
       return;
     }
@@ -317,7 +322,7 @@ const Admin = () => {
     }
 
     return () => clearInterval(interval);
-  }, [isPaused, isMatchRunning]);
+  }, [isPaused, isMatchRunning, isFinalized]);
 
   const getLeaderBoard = () => {
     const leaderBoard = Object.keys(teams).map((teamKey) => ({
@@ -369,7 +374,9 @@ const Admin = () => {
           player={alertNotification.player}
         />
       )}
-      <h1 className="text-3xl font-bold mb-6 text-center ">KickOff Live</h1>
+      <h1 className="md:text-4xl text-3xl font-bold mb-6 text-center ">
+        GameOn
+      </h1>
 
       <div className="mb-6">
         <h2 className="text-xl mb-2">Start a New Match</h2>
@@ -432,9 +439,9 @@ const Admin = () => {
             Current Match
           </h2>
 
-          <div className="text-lg flex md:flex-row justify-center flex-col items-center gap-3">
-            <div className="flex-col items-center mt-5 ">
-              <p className="md:text-4xl text-3xl ">{`${
+          <div className="text-lg flex md:flex-row justify-center flex-col items-center gap-3 mt-5">
+            <div className="flex-col justify-center">
+              <p className="md:text-4xl text-3xl text-center">{`${
                 teams[match.teamA].name
               } `}</p>
               {matchStats[match.teamA].yellowCards > 0 && (
@@ -461,15 +468,17 @@ const Admin = () => {
                 {match.score[teamA]}
               </p>
             </div>
-            <div className="flex gap-4 md:flex-col md:mx-7">
-              <span>vs</span>{" "}
+            <div className="flex gap-4 md:flex-col items-center md:mx-7">
+              <p className="text-2xl md:text-4xl font-bold">vs</p>
               <i class="fa-solid fa-volleyball fa-bounce text-2xl md:text-4xl"></i>
             </div>
-            <div className="mb-6 flex-col items-center ">
+            <div className="flex-col items-center max-md:mb-5">
               <p className="text-3xl mb-2 text-center font-bold md:hidden">
                 {match.score[teamB]}
               </p>
-              <p className="md:text-4xl text-3xl">{teams[match.teamB].name}</p>
+              <p className="md:text-4xl text-3xl text-center">
+                {teams[match.teamB].name}
+              </p>
               {matchStats[match.teamB].yellowCards > 0 && (
                 <span className="ml-2 text-yellow-400">
                   🟨 x {matchStats[match.teamB].yellowCards}
