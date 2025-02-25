@@ -143,7 +143,6 @@ const Admin = () => {
     setFoulPlayer("");
   };
 
-  // const handleFinalMatch = () => {
   //   // Determine the match result
   //   const teamAResult =
   //     match.score.teamA > match.score.teamB
@@ -370,69 +369,63 @@ const Admin = () => {
           player={alertNotification.player}
         />
       )}
-
       <h1 className="text-3xl font-bold mb-6 text-center ">KickOff Live</h1>
 
-      {match.teamA && match.teamB ? (
-        <button
-          className="bg-blue-500 py-2 px-3 my-3"
-          onClick={() => window.location.reload()}
-        >
-          Start a New Match
-        </button>
-      ) : (
-        <div className="mb-6">
-          <h2 className="text-xl mb-2">Start a New Match</h2>
+      <div className="mb-6">
+        <h2 className="text-xl mb-2">Start a New Match</h2>
 
-          <div className="flex md:flex-row flex-col gap-5">
-            <select
-              className="p-2 bg-gray-800"
-              value={teamA}
-              onChange={(e) => setTeamA(e.target.value)}
-            >
-              <option value="">Select Team A</option>
-              {Object.keys(teams).map((team) => (
-                <option key={team} value={team}>
-                  {teams[team].name}
-                </option>
-              ))}
-            </select>
+        <div className="flex md:flex-row flex-col gap-5">
+          <select
+            className="p-2 bg-gray-800"
+            value={teamA}
+            onChange={(e) => setTeamA(e.target.value)}
+          >
+            <option value="">Select Team A</option>
+            {Object.keys(teams).map((team) => (
+              <option key={team} value={team}>
+                {teams[team].name}
+              </option>
+            ))}
+          </select>
 
-            <select
-              className="p-2 bg-gray-800 ml-2"
-              value={teamB}
-              onChange={(e) => setTeamB(e.target.value)}
-            >
-              <option value="">Select Team B</option>
-              {Object.keys(teams).map((team) => (
-                <option key={team} value={team}>
-                  {teams[team].name}
-                </option>
-              ))}
-            </select>
+          <select
+            className="p-2 bg-gray-800 ml-2"
+            value={teamB}
+            onChange={(e) => setTeamB(e.target.value)}
+          >
+            <option value="">Select Team B</option>
+            {Object.keys(teams).map((team) => (
+              <option key={team} value={team}>
+                {teams[team].name}
+              </option>
+            ))}
+          </select>
 
-            <div
-              onClick={() => {
-                if (isFinalized) {
-                  alert(
-                    "The match is over! Please refresh the page to start a new match."
-                  );
-                }
-              }}
-              className="py-2 "
-            >
-              <button
-                className="ml-4 px-4 cursor-pointer py-2 bg-blue-500 rounded"
-                disabled={isFinalized}
-                onClick={handleCreateMatch}
-              >
-                Start Match
-              </button>
-            </div>
-          </div>
+          <button
+            className="ml-4 px-4 cursor-pointer py-2 bg-blue-500 rounded"
+            onClick={() => {
+              if (isFinalized) {
+                setMatch((prevMatch) => ({
+                  ...prevMatch,
+                  teamA: teamA,
+                  teamB: teamB,
+                  score: { teamA: 0, teamB: 0 },
+                  finalDecision: { teamA: "", teamB: "" },
+                }));
+
+                setIsFinalized(false);
+                setSeconds(0);
+                setMinutes(0);
+                setIsPaused(false);
+                setIsMatchRunning(true);
+              }
+              handleCreateMatch();
+            }}
+          >
+            Start Match
+          </button>
         </div>
-      )}
-
+      </div>
       {match.teamA && match.teamB && (
         <div className="mb-6 p-4 bg-gray-800 rounded">
           <h2 className="font-semibold mb-2 text-center md:text-4xl text-2xl">
@@ -515,7 +508,6 @@ const Admin = () => {
           </p>
         </div>
       )}
-
       {match.teamA && match.teamB && (
         <div className="mb-6 p-4 bg-gray-800 rounded">
           <h2 className="text-xl font-semibold mb-2">Update Score</h2>
@@ -575,7 +567,6 @@ const Admin = () => {
           </div>
         </div>
       )}
-
       {match.teamA && match.teamB && (
         <div className="mb-6 p-4 bg-gray-800 rounded">
           <h2 className="text-xl font-semibold mb-2">
@@ -634,7 +625,6 @@ const Admin = () => {
           </div>
         </div>
       )}
-
       {match.teamA && match.teamB && (
         <div className="flex flex-col md:flex-row gap-5">
           <button
@@ -658,11 +648,9 @@ const Admin = () => {
           </button>
         </div>
       )}
-
       <h2 className="text-2xl font-bold mb-6 text-center mt-6">
         Team Leaderboard
       </h2>
-
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -713,11 +701,9 @@ const Admin = () => {
           </tbody>
         </table>
       </div>
-
       <h2 className="text-2xl font-bold mb-6 text-center mt-6">
         Player LeaderBoard
       </h2>
-
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
