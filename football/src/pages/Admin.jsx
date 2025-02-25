@@ -22,6 +22,8 @@ const Admin = () => {
   const [assist, setAssist] = useState("");
   const [foulPlayer, setFoulPlayer] = useState("");
 
+  const [isFinalized, setIsFinalized] = useState(false);
+
   // For animation
   const [goal, setGoal] = useState("");
   const [foul, setFoul] = useState(false);
@@ -198,6 +200,8 @@ const Admin = () => {
   // };
 
   const handleFinalMatch = () => {
+    if (isFinalized) return;
+
     const teamAName = match.teamA;
     const teamBName = match.teamB;
     const teamAScore = match.score[teamA] ?? 0;
@@ -256,6 +260,7 @@ const Admin = () => {
     setTeams(updatedTeams);
 
     // Reset match timer
+    setIsFinalized(true);
     setIsMatchRunning(false);
     setSeconds(0);
     setMinutes(0);
@@ -607,6 +612,7 @@ const Admin = () => {
         <div className="flex flex-col md:flex-row gap-5">
           <button
             className="px-6 py-3 cursor-pointer bg-blue-700 rounded"
+            disabled={isFinalized}
             onClick={() => {
               handleFinalMatch();
             }}
