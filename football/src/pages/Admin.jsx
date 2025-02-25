@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { useGame } from "../context/GameContext";
-import { motion } from "framer-motion";
-import { FaFutbol } from "react-icons/fa";
 import AnimationAlert from "../Component/AnimationAlert";
 
 const Admin = () => {
@@ -53,6 +51,7 @@ const Admin = () => {
       teamA,
       teamB,
       score: { [teamA]: 0, [teamB]: 0 },
+      finalDecision: { teamA: "", teamB: "" },
     });
 
     setMatchStats({
@@ -76,21 +75,16 @@ const Admin = () => {
       },
     }));
 
-    // setMatchStats((prevStats) => ({
-    //   ...prevStats,
-    //   [team]: {
-    //     ...prevStats[team],
-    //     goals: [...(prevStats[team]?.goals || []), goalScorer],
-    //   },
-    // }));
-
     setMatchStats((prevStats) => ({
       ...prevStats,
       [team]: {
         ...prevStats[team],
         goals: [
           ...(prevStats[team]?.goals || []),
-          { scorer: goalScorer, time: `${minutes}'` }, // Only stores minutes
+          {
+            scorer: goalScorer,
+            time: `${minutes}:${seconds < 10 ? "0" + seconds : seconds}`,
+          }, // Stores minutes and seconds
         ],
       },
     }));
@@ -147,18 +141,80 @@ const Admin = () => {
     setFoulPlayer("");
   };
 
+  // const handleFinalMatch = () => {
+  //   // Determine the match result
+  //   const teamAResult =
+  //     match.score.teamA > match.score.teamB
+  //       ? "win"
+  //       : match.score.teamA < match.score.teamB
+  //       ? "lose"
+  //       : "draw";
+  //   const teamBResult =
+  //     match.score.teamB > match.score.teamA
+  //       ? "win"
+  //       : match.score.teamB < match.score.teamA
+  //       ? "lose"
+  //       : "draw";
+
+  //   // Set the final decisions in match state
+  //   setMatch((prevMatch) => ({
+  //     ...prevMatch,
+  //     finalDecision: {
+  //       teamA: teamAResult,
+  //       teamB: teamBResult,
+  //     },
+  //   }));
+
+  //   const updatedTeams = { ...teams };
+
+  //   if (teamAResult === "win") {
+  //     updatedTeams[match.teamA].points += 3;
+  //   } else if (teamAResult === "draw") {
+  //     updatedTeams[match.teamA].points += 1;
+  //   }
+
+  //   if (teamBResult === "win") {
+  //     updatedTeams[match.teamB].points += 3;
+  //   } else if (teamBResult === "draw") {
+  //     updatedTeams[match.teamB].points += 1;
+  //   }
+
+  //   setTeams(updatedTeams);
+
+  //   setIsMatchRunning(false);
+  //   setSeconds(0);
+  //   setMinutes(0);
+  //   setIsPaused(true);
+
+  //   alert(
+  //     `Match Finalized!\n\n${match.teamA} ${match.score[match.teamA]} - ${
+  //       match.score[match.teamB]
+  //     }`
+  //   );
+
+  //   console.log("Match Finalized:", match);
+  //   console.log("Updated Teams Points:", updatedTeams);
+  //   console.log("Final Match Stats:", matchStats);
+  // };
+
   const handleFinalMatch = () => {
-    // Determine the match result
+    const teamAName = match.teamA;
+    const teamBName = match.teamB;
+    const teamAScore = match.score[teamA] ?? 0;
+    const teamBScore = match.score[teamB] ?? 0;
+    console.log(teamAName, teamBName, teamAScore, teamBScore);
+
+    // Determine match results
     const teamAResult =
-      match.score.teamA > match.score.teamB
+      teamAScore > teamBScore
         ? "win"
-        : match.score.teamA < match.score.teamB
+        : teamAScore < teamBScore
         ? "lose"
         : "draw";
     const teamBResult =
-      match.score.teamB > match.score.teamA
+      teamBScore > teamAScore
         ? "win"
-        : match.score.teamB < match.score.teamA
+        : teamBScore < teamAScore
         ? "lose"
         : "draw";
 
@@ -171,35 +227,47 @@ const Admin = () => {
       },
     }));
 
+    // Create a copy of the teams object
     const updatedTeams = { ...teams };
 
+    // Update Team A stats
     if (teamAResult === "win") {
       updatedTeams[match.teamA].points += 3;
+      updatedTeams[match.teamA].wins += 1;
     } else if (teamAResult === "draw") {
       updatedTeams[match.teamA].points += 1;
+      updatedTeams[match.teamA].draws += 1;
+    } else {
+      updatedTeams[match.teamA].losses += 1;
     }
 
+    // Update Team B stats
     if (teamBResult === "win") {
       updatedTeams[match.teamB].points += 3;
+      updatedTeams[match.teamB].wins += 1;
     } else if (teamBResult === "draw") {
       updatedTeams[match.teamB].points += 1;
+      updatedTeams[match.teamB].draws += 1;
+    } else {
+      updatedTeams[match.teamB].losses += 1;
     }
 
+    // Update teams state
     setTeams(updatedTeams);
 
+    // Reset match timer
     setIsMatchRunning(false);
     setSeconds(0);
     setMinutes(0);
     setIsPaused(true);
 
+    // Alert the final match result
     alert(
-      `Match Finalized!\n\n${match.teamA} ${match.score[match.teamA]} - ${
-        match.score[match.teamB]
-      }`
+      `Match Finalized!\n\n${teamAName} ${match.score[teamA]} - ${match.score[teamB]} ${teamBName}`
     );
 
     console.log("Match Finalized:", match);
-    console.log("Updated Teams Points:", updatedTeams);
+    console.log("Updated Teams:", updatedTeams);
     console.log("Final Match Stats:", matchStats);
   };
 
@@ -360,9 +428,13 @@ const Admin = () => {
                   🟥 x {matchStats[match.teamA].redCards}
                 </span>
               )}
+
               {matchStats[match.teamA]?.goals.map((goal, index) => (
                 <p key={index} className="text-white">
-                  ⚽ {goal.scorer} scored at {goal.time}
+                  ⚽ {goal.scorer} scored at{" "}
+                  {parseInt(goal.time.split(":")[0]) === 0
+                    ? `${goal.time.split(":")[1]}''`
+                    : `${goal.time.split(":")[0]}'`}
                 </p>
               ))}
 
@@ -391,7 +463,10 @@ const Admin = () => {
               )}
               {matchStats[match.teamB]?.goals.map((goal, index) => (
                 <p key={index} className="text-white">
-                  ⚽ {goal.scorer} scored at {goal.time}
+                  ⚽ {goal.scorer} scored at{" "}
+                  {parseInt(goal.time.split(":")[0]) === 0
+                    ? `${goal.time.split(":")[1]}''`
+                    : `${goal.time.split(":")[0]}'`}
                 </p>
               ))}
             </div>
